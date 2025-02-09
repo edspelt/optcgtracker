@@ -4,13 +4,9 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
-type Context = {
-  params: { id: string }
-}
-
 export async function PATCH(
   req: NextRequest,
-  context: Context
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -39,4 +35,4 @@ export async function PATCH(
     console.error('[MATCH_REVIEW]', error)
     return new NextResponse('Internal error', { status: 500 })
   }
-} 
+}
