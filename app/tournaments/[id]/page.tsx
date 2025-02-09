@@ -2,7 +2,6 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import { prisma } from '@/lib/prisma'
-import TournamentDetails from '@/components/tournaments/TournamentDetails'
 import { updateTournamentStatuses } from '@/middleware/tournament-status'
 import TournamentRanking from '@/components/tournaments/TournamentRanking'
 
@@ -53,11 +52,6 @@ export default async function TournamentPage({ params }: { params: { id: string 
 
   if (!tournament) {
     redirect('/tournaments/list')
-  }
-
-  const transformedTournament = {
-    ...tournament,
-    participants: tournament.participants.map(p => p.user)
   }
 
   return (

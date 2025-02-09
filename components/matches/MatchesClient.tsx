@@ -1,9 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { User, Match, Tournament, TournamentParticipant } from '@prisma/client'
+import { User, Match, Tournament } from '@prisma/client'
 import { useRouter } from 'next/navigation'
-import { isTournamentActive, formatTournamentDuration, getRemainingDays } from '@/lib/tournament-utils'
+import { formatTournamentDuration, getRemainingDays } from '@/lib/tournament-utils'
 import BackButton from '@/components/common/BackButton'
 import { toast } from 'react-hot-toast'
 
@@ -50,7 +50,6 @@ export default function MatchesClient({
   })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
 
   // Debug de los torneos recibidos
   console.log('DEBUG - MatchesClient recibió:', {

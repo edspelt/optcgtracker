@@ -33,7 +33,7 @@ export default function LoginForm() {
         router.push(callbackUrl)
         router.refresh()
       }
-    } catch (_) {
+    } catch {
       setError('Ocurrió un error al iniciar sesión')
     } finally {
       setIsLoading(false)

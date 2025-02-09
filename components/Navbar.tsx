@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { Role } from '@prisma/client'
 
 export default function Navbar() {
