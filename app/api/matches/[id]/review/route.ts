@@ -1,18 +1,16 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
-type Props = {
-  params: {
-    id: string
-  }
+type Context = {
+  params: { id: string }
 }
 
 export async function PATCH(
-  request: Request,
-  props: Props
+  req: NextRequest,
+  context: Context
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -21,7 +19,7 @@ export async function PATCH(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const body = await request.json()
+    const body = await req.json()
     const { status } = body
 
     if (!['APPROVED', 'REJECTED'].includes(status)) {
@@ -29,7 +27,7 @@ export async function PATCH(
     }
 
     const match = await prisma.match.update({
-      where: { id: props.params.id },
+      where: { id: context.params.id },
       data: {
         status,
         approvedById: session.user.id
