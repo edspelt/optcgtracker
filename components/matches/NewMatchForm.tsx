@@ -1,13 +1,13 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { User, Tournament } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import BackButton from '@/components/common/BackButton'
 
 interface NewMatchFormProps {
   users: Pick<User, 'id' | 'name' | 'email'>[]
-  currentUser: User
+  currentUser: User // Requerido para futuras funcionalidades
   preselectedTournament?: Tournament | null
 }
 
@@ -28,6 +28,15 @@ export default function NewMatchForm({ users, currentUser, preselectedTournament
     user.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
     user.email?.toLowerCase().includes(searchTerm.toLowerCase())
   )
+
+  useEffect(() => {
+    if (currentUser.preferredLeader) {
+      setMatchDetails(prev => ({
+        ...prev,
+        player1Leader: currentUser.preferredLeader
+      }))
+    }
+  }, [currentUser])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

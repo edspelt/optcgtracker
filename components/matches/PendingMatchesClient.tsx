@@ -90,7 +90,7 @@ export default function PendingMatchesClient({ initialMatches }: PendingMatchesC
         setMatches(data)
         toast.success('Lista actualizada')
       }
-    } catch (error) {
+    } catch {
       toast.error('Error al actualizar la lista')
     }
   }
@@ -104,20 +104,29 @@ export default function PendingMatchesClient({ initialMatches }: PendingMatchesC
         {matches.length} partida{matches.length !== 1 ? 's' : ''} pendiente{matches.length !== 1 ? 's' : ''} de revisión
       </p>
 
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
         <select 
           value={filter}
           onChange={(e) => setFilter(e.target.value)}
-          className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-op-dark"
+          className="mt-1 block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-op-dark"
         >
           <option value="all">Todas las partidas</option>
           <option value="tournament">Solo torneos</option>
           <option value="friendly">Solo amistosas</option>
         </select>
+
+        <select
+          value={sortOrder}
+          onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
+          className="mt-1 block w-48 pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md dark:bg-op-dark"
+        >
+          <option value="desc">Más recientes primero</option>
+          <option value="asc">Más antiguas primero</option>
+        </select>
       </div>
 
       <div className="space-y-4">
-        {matches
+        {sortedMatches
           .filter(match => {
             if (filter === 'tournament') return match.tournament
             if (filter === 'friendly') return !match.tournament

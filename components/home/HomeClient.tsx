@@ -2,12 +2,12 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { useTheme } from 'next-themes'
+// import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
 import { ArrowRightIcon } from '@heroicons/react/24/outline'
 
 export default function HomeClient() {
-  const { theme, setTheme } = useTheme()
+  // const { theme, setTheme } = useTheme()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
