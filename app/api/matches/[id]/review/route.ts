@@ -4,9 +4,15 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
+type Props = {
+  params: {
+    id: string
+  }
+}
+
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  props: Props
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -23,7 +29,7 @@ export async function PATCH(
     }
 
     const match = await prisma.match.update({
-      where: { id: params.id },
+      where: { id: props.params.id },
       data: {
         status,
         approvedById: session.user.id
