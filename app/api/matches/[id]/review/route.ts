@@ -5,8 +5,8 @@ import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
 export async function PATCH(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  context: { params: { id: string } }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -15,7 +15,7 @@ export async function PATCH(
       return new NextResponse('Unauthorized', { status: 401 })
     }
 
-    const body = await req.json()
+    const body = await request.json()
     const { status } = body
 
     if (!['APPROVED', 'REJECTED'].includes(status)) {
@@ -23,7 +23,7 @@ export async function PATCH(
     }
 
     const match = await prisma.match.update({
-      where: { id: params.id },
+      where: { id: context.params.id },
       data: {
         status,
         approvedById: session.user.id

@@ -6,13 +6,8 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
-    serverActions: true,
     typedRoutes: true
-  },
-  compress: true,
-  poweredByHeader: false,
-  reactStrictMode: true,
-  swcMinify: true
+  }
 }
 
 module.exports = nextConfig 
