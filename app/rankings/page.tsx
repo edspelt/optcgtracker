@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
-import { authOptions } from '@/app/api/auth/[...nextauth]/route'
+import { authOptions } from '@/lib/auth'
 import TournamentRanking from '@/components/tournaments/TournamentRanking'
 
 export default async function RankingsPage() {
