@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { User, Match, Tournament } from '@prisma/client'
-import { useRouter } from 'next/navigation'
 import { formatTournamentDuration, getRemainingDays } from '@/lib/tournament-utils'
 import BackButton from '@/components/common/BackButton'
 import { toast } from 'react-hot-toast'
