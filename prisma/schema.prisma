@@ -1,0 +1,154 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  relationMode = "foreignKeys"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          Role      @default(PLAYER)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Relaciones para partidas
+  sentMatches     Match[] @relation("SentMatches")
+  receivedMatches Match[] @relation("ReceivedMatches")
+  tournaments     Tournament[]  // Torneos que gestiona (para JUDGE y ADMIN)
+  participations  TournamentParticipant[] // Torneos en los que participa
+  tournamentRankings TournamentRanking[]
+  weeklyRankings  WeeklyRanking[]
+  approvedMatches Match[] @relation("ApprovedMatches")
+}
+
+enum Role {
+  PLAYER    // Usuario básico - puede registrar partidas y ver rankings
+  JUDGE     // Puede crear y gestionar torneos
+  ADMIN     // Acceso total al sistema
+}
+
+model Match {
+  id            String      @id @default(cuid())
+  status        MatchStatus @default(PENDING)
+  result        MatchResult? // WIN o LOSS para player1 (el creador)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  
+  // Jugadores
+  player1Id     String
+  player2Id     String
+  player1       User        @relation("SentMatches", fields: [player1Id], references: [id])
+  player2       User        @relation("ReceivedMatches", fields: [player2Id], references: [id])
+  
+  // Detalles del juego
+  player1Leader String      // Nombre del líder del jugador 1
+  player2Leader String      // Nombre del líder del jugador 2
+  
+  // Admin que aprobó la partida
+  approvedBy    User?     @relation("ApprovedMatches", fields: [approvedById], references: [id])
+  approvedById  String?
+  notes         String?     // Notas adicionales o comentarios
+
+  // Relación con torneo
+  tournament   Tournament? @relation(fields: [tournamentId], references: [id])
+  tournamentId String?
+}
+
+enum MatchStatus {
+  PENDING    // Esperando confirmación del oponente
+  APPROVED   // Aprobada por admin
+  REJECTED   // Rechazada por admin o jugador
+  CANCELLED  // Cancelada por el creador
+}
+
+enum MatchResult {
+  WIN
+  LOSS
+}
+
+model Tournament {
+  id           String      @id @default(cuid())
+  name         String
+  startDate    DateTime
+  endDate      DateTime
+  duration     TournamentDuration @default(WEEKLY)
+  status       TournamentStatus @default(UPCOMING)
+  description  String?
+  maxPlayers   Int?
+  createdBy    User        @relation(fields: [createdById], references: [id])
+  createdById  String
+  matches      Match[]
+  participants TournamentParticipant[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  rankings     TournamentRanking[]
+}
+
+enum TournamentDuration {
+  WEEKLY
+  MONTHLY
+  SEASONAL    // Para torneos de varios meses
+}
+
+enum TournamentStatus {
+  UPCOMING    // Aún no comienza
+  ONGOING     // En curso
+  COMPLETED   // Finalizado
+  CANCELLED   // Cancelado
+}
+
+model TournamentRanking {
+  id           String    @id @default(cuid())
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  wins         Int       @default(0)
+  losses       Int       @default(0)
+  position     Int
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([tournamentId, userId])
+}
+
+model WeeklyRanking {
+  id           String      @id @default(cuid())
+  weekNumber   Int
+  year         Int
+  user         User        @relation(fields: [userId], references: [id])
+  userId       String
+  points       Int
+  position     Int
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+// Nueva tabla para manejar inscripciones a torneos
+model TournamentParticipant {
+  id           String    @id @default(cuid())
+  tournament   Tournament @relation(fields: [tournamentId], references: [id])
+  tournamentId String
+  user         User      @relation(fields: [userId], references: [id])
+  userId       String
+  status       ParticipantStatus @default(PENDING)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([tournamentId, userId])
+}
+
+enum ParticipantStatus {
+  PENDING   // Esperando aprobación
+  APPROVED  // Participación confirmada
+  REJECTED  // Participación rechazada
+  WITHDRAWN // Participante se retiró
+} 
