@@ -4,10 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
-export async function PATCH(
-  req: NextRequest,
-  context: { params: { id: string } }
-) {
+export async function PATCH(req: NextRequest, context: any) {
   try {
     const session = await getServerSession(authOptions)
     
