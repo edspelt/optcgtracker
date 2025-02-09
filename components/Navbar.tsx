@@ -9,7 +9,6 @@ import { Role } from '@prisma/client'
 export default function Navbar() {
   const { data: session, status } = useSession()
   const [isMenuOpen, setIsMenuOpen] = useState(false)
-  const router = useRouter()
 
   const handleSignOut = async () => {
     await signOut({ 

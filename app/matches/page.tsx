@@ -3,7 +3,6 @@ import { redirect } from 'next/navigation'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import MatchesClient from '@/components/matches/MatchesClient'
 import { prisma } from '@/lib/prisma'
-import { updateTournamentStatuses } from '@/middleware/tournament-status'
 
 export default async function MatchesPage() {
   const session = await getServerSession(authOptions)

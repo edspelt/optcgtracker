@@ -9,8 +9,17 @@ import Navbar from "@/components/Navbar"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "OPTCG Tracker",
-  description: "Tracking para jugadores de One Piece TCG",
+  metadataBase: new URL('https://your-domain.com'),
+  title: {
+    default: 'OP TCG Tracker',
+    template: '%s | OP TCG Tracker'
+  },
+  description: 'Gestiona tus partidas de One Piece TCG',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1
+  }
 }
 
 export default function RootLayout({

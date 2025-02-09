@@ -4,7 +4,6 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/app/api/auth/[...nextauth]/route'
 import WelcomeScreen from '@/components/dashboard/WelcomeScreen'
 import DashboardStats from '@/components/dashboard/DashboardStats'
-import DashboardActions from '@/components/dashboard/DashboardActions'
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
@@ -91,7 +90,6 @@ export default async function DashboardPage() {
         matches={matches}
         tournamentRanking={tournamentRanking}
       />
-      {/* <DashboardActions /> */}
     </div>
   )
 } 
