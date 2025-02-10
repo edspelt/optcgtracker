@@ -5,53 +5,62 @@ import { prisma } from '@/lib/prisma'
 import { updateTournamentStatuses } from '@/middleware/tournament-status'
 import TournamentRanking from '@/components/tournaments/TournamentRanking'
 
-export default async function TournamentPage({ params }: { params: { id: string } }) {
-  const session = await getServerSession(authOptions)
+export default async function TournamentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  // Resolver la promesa de params
+  const resolvedParams = await params;
+
+  const session = await getServerSession(authOptions);
 
   if (!session?.user?.id) {
-    redirect('/login')
+    redirect('/login');
+    return null;
   }
 
   // Actualizar estados antes de obtener el torneo
-  await updateTournamentStatuses()
+  await updateTournamentStatuses();
 
   const tournament = await prisma.tournament.findUnique({
     where: {
-      id: params.id
+      id: resolvedParams.id,
     },
     include: {
       _count: {
         select: {
           matches: true,
-          participants: true
-        }
+          participants: true,
+        },
       },
       matches: {
         include: {
           player1: true,
-          player2: true
+          player2: true,
         },
         orderBy: {
-          createdAt: 'desc'
+          createdAt: 'desc',
         },
-        take: 10
+        take: 10,
       },
       participants: {
         include: {
-          user: true
-        }
+          user: true,
+        },
       },
       createdBy: {
         select: {
           name: true,
-          email: true
-        }
-      }
-    }
-  })
+          email: true,
+        },
+      },
+    },
+  });
 
   if (!tournament) {
-    redirect('/tournaments/list')
+    redirect('/tournaments/list');
+    return null;
   }
 
   return (
@@ -71,5 +80,5 @@ export default async function TournamentPage({ params }: { params: { id: string 
         <TournamentRanking tournament={tournament} />
       </div>
     </div>
-  )
-} 
+  );
+}

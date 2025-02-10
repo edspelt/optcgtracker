@@ -1,13 +1,14 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function POST(
-  req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function POST(req: NextRequest) {
   try {
+    // Obtener el ID desde la URL
+    const url = new URL(req.url)
+    const id = url.pathname.split('/').slice(-2, -1)[0] // Extrae el ID dinámico
+
     const tournament = await prisma.tournament.findUnique({
-      where: { id: params.id }
+      where: { id },
     })
 
     if (!tournament) {
@@ -49,4 +50,4 @@ export async function POST(
       { status: 500 }
     )
   }
-} 
+}

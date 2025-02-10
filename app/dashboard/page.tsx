@@ -12,6 +12,15 @@ export default async function DashboardPage() {
     redirect('/login')
   }
 
+  // Si necesitas más campos del usuario, obtén el usuario completo de la base de datos
+  const fullUser = await prisma.user.findUnique({
+    where: { id: session.user.id }
+  })
+
+  if (!fullUser) {
+    redirect('/login')
+  }
+
   // Obtener partidas del usuario
   const matches = await prisma.match.findMany({
     where: {

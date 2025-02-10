@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { prisma } from '@/lib/prisma'
-import { compare } from 'bcrypt'
+import { compare } from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -22,11 +22,13 @@ export const authOptions: NextAuthOptions = {
           }
         })
 
-        if (!user) {
+        if (!user || !user.password) {
           return null
         }
 
-        const isPasswordValid = await compare(credentials.password, user.password)
+        const isPasswordValid = user.password
+          ? await compare(credentials.password, user.password)
+          : false;
 
         if (!isPasswordValid) {
           return null
@@ -34,9 +36,14 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: user.id,
-          email: user.email,
-          name: user.name,
-          role: user.role
+          email: user.email ?? '',
+          name: user.name ?? '',
+          role: user.role,
+          emailVerified: user.emailVerified ?? null, // Añadir propiedades faltantes
+          image: user.image ?? null,
+          password: user.password ?? null,
+          createdAt: user.createdAt,
+          updatedAt: user.updatedAt
         }
       }
     })
@@ -63,4 +70,4 @@ export const authOptions: NextAuthOptions = {
       return token
     }
   }
-} 
+}

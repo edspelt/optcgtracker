@@ -4,13 +4,16 @@ import { prisma } from '@/lib/prisma'
 import { authOptions } from '@/lib/auth'
 import { canApproveMatches } from '@/middleware/permissions'
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
-    
+
     if (!session?.user?.id || !canApproveMatches(session.user.role)) {
       return new NextResponse('Unauthorized', { status: 401 })
     }
+
+    const url = new URL(req.url)
+    const id = url.pathname.split('/').slice(-2, -1)[0] // Extrae el ID desde la URL
 
     const body = await req.json()
     const { status } = body
@@ -20,7 +23,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     }
 
     const match = await prisma.match.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status,
         approvedById: session.user.id
