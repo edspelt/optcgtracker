@@ -21,6 +21,8 @@ function UserModal({ user, onClose, onPasswordChange }: UserModalProps) {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState('')
+  const [selectedRole, setSelectedRole] = useState(user.role)
+  const [isUpdatingRole, setIsUpdatingRole] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +43,33 @@ function UserModal({ user, onClose, onPasswordChange }: UserModalProps) {
       setError(err instanceof Error ? err.message : 'Error al actualizar la contraseña')
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  const handleRoleChange = async (newRole: string) => {
+    try {
+      setIsUpdatingRole(true)
+      setError('')
+
+      const response = await fetch(`/api/admin/users/${user.id}/role`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ role: newRole }),
+      })
+
+      if (!response.ok) {
+        const data = await response.json()
+        throw new Error(data.message || 'Error al actualizar el rol')
+      }
+
+      setSelectedRole(newRole as User['role'])
+      toast.success('Rol actualizado correctamente')
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al actualizar el rol')
+    } finally {
+      setIsUpdatingRole(false)
     }
   }
 
@@ -81,15 +110,21 @@ function UserModal({ user, onClose, onPasswordChange }: UserModalProps) {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Rol
             </label>
-            <span className={`mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-              user.role === 'ADMIN' 
-                ? 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300'
-                : user.role === 'JUDGE'
-                ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300'
-            }`}>
-              {user.role}
-            </span>
+            <select
+              value={selectedRole}
+              onChange={(e) => handleRoleChange(e.target.value)}
+              disabled={isUpdatingRole || user.role === 'ADMIN'}
+              className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-op-red focus:border-op-red sm:text-sm rounded-md dark:bg-op-dark dark:border-gray-600 dark:text-white"
+            >
+              <option value="PLAYER">Jugador</option>
+              <option value="JUDGE">Juez</option>
+              <option value="ADMIN">Administrador</option>
+            </select>
+            {user.role === 'ADMIN' && (
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                No se puede modificar el rol de un administrador
+              </p>
+            )}
           </div>
 
           <div>
