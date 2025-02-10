@@ -1,38 +1,31 @@
 import { getServerSession } from 'next-auth'
-import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
+import { redirect } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import UserManagement from '@/components/admin/UserManagement'
+import type { User } from '@prisma/client'
 
 export default async function AdminUsersPage() {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user?.id) {
-    redirect('/login')
+  if (!session?.user || session.user.role !== 'ADMIN') {
+    redirect('/')
   }
 
-  // Verificar si el usuario es admin
-  if (session.user.role !== 'ADMIN') {
-    redirect('/dashboard')
-  }
-
-  // Obtener la lista completa de usuarios con todos los campos necesarios
+  // Obtener todos los campos necesarios del usuario
   const users = await prisma.user.findMany({
-    orderBy: {
-      createdAt: 'desc'
-    },
     select: {
       id: true,
       name: true,
       email: true,
+      emailVerified: true,
+      image: true,
+      password: true,
       role: true,
       createdAt: true,
-      // No incluimos campos sensibles como password
+      updatedAt: true
     }
-  })
-
-  // Agregar console.log para debug
-  console.log('Users fetched:', users)
+  }) as User[]
 
   return (
     <div className="p-4">

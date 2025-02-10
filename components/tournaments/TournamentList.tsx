@@ -1,15 +1,15 @@
 'use client'
 
-import { TournamentWithDetails } from '@/types'
-import { User } from '@prisma/client'
+import { type Session } from 'next-auth'
 import { useRouter } from 'next/navigation'
 import BackButton from '@/components/common/BackButton'
 import { formatTournamentDuration } from '@/lib/tournament-utils'
 import { useState } from 'react'
+import type { TournamentWithDetails } from '@/types'
 
 interface TournamentListProps {
   tournaments: TournamentWithDetails[]
-  currentUser: User
+  currentUser: Session['user']
 }
 
 export default function TournamentList({ tournaments, currentUser }: TournamentListProps) {
@@ -63,7 +63,7 @@ export default function TournamentList({ tournaments, currentUser }: TournamentL
 
       <div className="mt-8 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {tournaments.map((tournament) => {
-          const isParticipant = tournament.participants.some(p => p.id === currentUser.id)
+          const isParticipant = tournament.participants.some(p => p.userId === currentUser.id)
           
           return (
             <div

@@ -11,6 +11,15 @@ export default async function MatchesPage() {
     redirect('/login')
   }
 
+  // Obtener el usuario completo de la base de datos
+  const currentUser = await prisma.user.findUnique({
+    where: { id: session.user.id }
+  })
+
+  if (!currentUser) {
+    redirect('/login')
+  }
+
   // Obtener las partidas del usuario
   const matches = await prisma.match.findMany({
     where: {
@@ -73,13 +82,13 @@ export default async function MatchesPage() {
   const transformedMatches = matches.map(match => ({
     ...match,
     tournament: match.tournament || undefined
-  }));
+  }))
 
   return (
     <MatchesClient 
       initialMatches={transformedMatches}
       users={users}
-      currentUser={session.user}
+      currentUser={currentUser}
       tournaments={tournaments}
     />
   )

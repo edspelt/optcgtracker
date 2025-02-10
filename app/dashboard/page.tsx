@@ -8,91 +8,47 @@ import DashboardStats from '@/components/dashboard/DashboardStats'
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions)
 
-  if (!session?.user?.id) {
+  if (!session?.user) {
     redirect('/login')
   }
 
-  // Si necesitas más campos del usuario, obtén el usuario completo de la base de datos
-  const fullUser = await prisma.user.findUnique({
-    where: { id: session.user.id }
-  })
-
-  if (!fullUser) {
-    redirect('/login')
-  }
-
-  // Obtener partidas del usuario
-  const matches = await prisma.match.findMany({
-    where: {
-      OR: [
-        { player1Id: session.user.id },
-        { player2Id: session.user.id }
-      ]
-    },
-    include: {
-      tournament: true
-    }
-  })
-
-  // Obtener ranking del torneo activo (si existe)
-  const activeTournament = await prisma.tournament.findFirst({
-    where: {
-      status: 'ONGOING',
-      participants: {
-        some: {
-          userId: session.user.id,
-          status: 'APPROVED'
-        }
+  // Obtener partidas y ranking con el nombre del torneo
+  const [matches, tournamentRanking] = await Promise.all([
+    prisma.match.findMany({
+      where: {
+        OR: [
+          { player1Id: session.user.id },
+          { player2Id: session.user.id }
+        ]
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
-    },
-    include: {
-      matches: {
-        where: {
-          status: 'APPROVED'
-        },
-        include: {
-          player1: true,
-          player2: true
+    }),
+    prisma.tournamentRanking.findFirst({
+      where: {
+        userId: session.user.id
+      },
+      include: {
+        tournament: {
+          select: {
+            name: true,
+            participants: {
+              select: {
+                userId: true
+              }
+            }
+          }
         }
       },
-      participants: {
-        include: {
-          user: true
-        }
+      orderBy: {
+        createdAt: 'desc'
       }
-    }
-  })
-
-  let tournamentRanking
-  if (activeTournament) {
-    // Calcular posiciones
-    const rankings = activeTournament.participants.map(participant => {
-      const playerMatches = activeTournament.matches.filter(match =>
-        match.player1Id === participant.userId || match.player2Id === participant.userId
-      )
-      const wins = playerMatches.filter(match =>
-        (match.player1Id === participant.userId && match.result === 'WIN') ||
-        (match.player2Id === participant.userId && match.result === 'LOSS')
-      ).length
-
-      return {
-        userId: participant.userId,
-        wins,
-        matches: playerMatches.length
-      }
-    }).sort((a, b) => b.wins - a.wins)
-
-    const userPosition = rankings.findIndex(r => r.userId === session.user.id) + 1
-    
-    tournamentRanking = {
-      position: userPosition,
-      totalPlayers: rankings.length,
-      tournamentName: activeTournament.name
-    }
-  }
+    })
+  ])
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="container mx-auto px-4 py-8">
       <WelcomeScreen user={session.user} />
       <DashboardStats 
         user={session.user}

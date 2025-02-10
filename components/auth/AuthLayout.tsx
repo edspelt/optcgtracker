@@ -20,22 +20,24 @@ export default function AuthLayout({
   linkHref
 }: AuthLayoutProps) {
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex flex-col lg:flex-row">
       {/* Panel lateral con imagen/diseño */}
-      <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-op-red to-op-yellow">
-        <div className="flex flex-col justify-center items-center w-full">
-          <div className="p-12 text-center">
+      <div className="lg:w-1/2 bg-gradient-to-br from-op-red to-op-yellow py-8 lg:py-0">
+        <div className="flex flex-col justify-center items-center h-full w-full px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-md">
+            {/* Logo visible en todos los tamaños */}
             <Image
-              src="/images/logo.png" // Asegúrate de tener este archivo
+              src="/images/logo.png"
               alt="OP TCG Tracker Logo"
-              width={200}
-              height={200}
-              className="mx-auto mb-8"
+              width={150}
+              height={150}
+              className="mx-auto mb-6 w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40"
+              priority
             />
-            <h2 className="text-4xl font-bold text-white mb-4">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white mb-4">
               OP TCG Tracker
             </h2>
-            <p className="text-white/90 text-lg">
+            <p className="text-white/90 text-sm sm:text-base lg:text-lg max-w-sm mx-auto">
               La mejor plataforma para gestionar tus partidas de One Piece TCG
             </p>
           </div>
@@ -43,38 +45,35 @@ export default function AuthLayout({
       </div>
 
       {/* Formulario */}
-      <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-op-dark">
-        <div className="max-w-md w-full space-y-8">
-          {/* Logo para móvil */}
-          <div className="lg:hidden text-center">
-            <Image
-              src="/images/logo.png"
-              alt="OP TCG Tracker Logo"
-              width={100}
-              height={100}
-              className="mx-auto mb-4"
-            />
-          </div>
-
+      <div className="flex-1 flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-8 lg:py-12 bg-gray-50 dark:bg-op-dark">
+        <div className="w-full max-w-md space-y-6 sm:space-y-8">
           <div className="text-center">
-            <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white">
+            <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 dark:text-white">
               {title}
             </h1>
-            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+            <p className="mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
               {subtitle}
             </p>
           </div>
 
-          {children}
+          {/* Contenedor del formulario con scroll si es necesario */}
+          <div className="max-h-[calc(100vh-16rem)] overflow-y-auto px-1">
+            {children}
+          </div>
 
-          <div className="text-center mt-4">
+          <div className="text-center pt-4 sm:pt-6">
             <Link
               href={linkHref as Route}
-              className="text-sm text-op-red hover:text-op-red-dark dark:hover:text-op-yellow transition-colors"
+              className="text-sm sm:text-base text-op-red hover:text-op-red-dark dark:hover:text-op-yellow transition-colors"
             >
               {linkText}
             </Link>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div className="mt-8 text-center text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+          <p>&copy; {new Date().getFullYear()} H20nte Trade Store. Todos los derechos reservados.</p>
         </div>
       </div>
     </div>

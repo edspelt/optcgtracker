@@ -1,23 +1,29 @@
 'use client'
 
-import { User, Match, Tournament } from '@prisma/client'
+import { type Session } from 'next-auth'
+import { Match, TournamentRanking } from '@prisma/client'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { TrophyIcon, ChartBarIcon, PlusIcon } from '@heroicons/react/24/outline'
 
-type DashboardStatsProps = {
-  user: User
-  matches: (Match & {
-    tournament: Tournament | null
-  })[]
-  tournamentRanking?: {
-    position: number
-    totalPlayers: number
-    tournamentName: string
-  }
+interface DashboardStatsProps {
+  user: Session['user']
+  matches: Match[]
+  tournamentRanking: (TournamentRanking & {
+    tournament: {
+      name: string
+      participants: {
+        userId: string
+      }[]
+    }
+  }) | null
 }
 
-export default function DashboardStats({ user, matches, tournamentRanking }: DashboardStatsProps) {
+export default function DashboardStats({
+  user,
+  matches,
+  tournamentRanking
+}: DashboardStatsProps) {
   // Calcular estadísticas
   const approvedMatches = matches.filter(match => match.status === 'APPROVED')
   const totalMatches = approvedMatches.length
@@ -69,14 +75,14 @@ export default function DashboardStats({ user, matches, tournamentRanking }: Das
           {tournamentRanking ? (
             <div className="space-y-3">
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                {tournamentRanking.tournamentName}
+                {tournamentRanking.tournament.name}
               </p>
               <div className="flex items-baseline">
                 <span className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">
                   {tournamentRanking.position}º
                 </span>
                 <span className="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                  de {tournamentRanking.totalPlayers} participantes
+                  de {tournamentRanking.tournament.participants.length} participantes
                 </span>
               </div>
             </div>

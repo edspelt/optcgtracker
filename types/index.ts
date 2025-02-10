@@ -1,4 +1,4 @@
-import { User as PrismaUser, TournamentStatus as PrismaTournamentStatus, TournamentDuration as PrismaTournamentDuration } from "@prisma/client"
+import { User as PrismaUser, TournamentStatus as PrismaTournamentStatus, TournamentDuration as PrismaTournamentDuration, Tournament, TournamentParticipant, ParticipantStatus } from "@prisma/client"
 
 // Extender el tipo User de Prisma
 export interface User extends PrismaUser {
@@ -16,26 +16,19 @@ export interface MatchWithPlayers {
   // ... otros campos
 }
 
-export interface TournamentWithDetails {
-  id: string;
-  name: string;
-  status: PrismaTournamentStatus;
-  startDate: Date;
-  endDate: Date;
-  duration: PrismaTournamentDuration;
-  description: string | null;
-  maxPlayers: number | null;
-  createdById: string;
-  createdAt: Date;
-  updatedAt: Date;
-  _count: {
-    participants: number;
-    matches: number;
-  };
-  participants: User[];
+export type TournamentWithDetails = Tournament & {
+  participants: {
+    id: string
+    userId: string
+    status: ParticipantStatus
+  }[]
   createdBy: {
-    name: string | null;
-  };
+    id: string
+    name: string | null
+  }
+  _count: {
+    participants: number
+  }
 }
 
 export type MatchResult = 'WIN' | 'LOSS';

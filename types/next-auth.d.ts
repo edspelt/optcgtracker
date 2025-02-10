@@ -1,31 +1,18 @@
 import 'next-auth'
-import { Role } from '@prisma/client'
+import { User as PrismaUser, Role } from '@prisma/client'
 
 declare module 'next-auth' {
+  interface User extends Omit<PrismaUser, 'password'> {}
+
   interface Session {
     user: {
       id: string
       name: string | null
-      email: string | null
-      emailVerified: Date | null
-      image: string | null
-      password: string | null
+      email: string
       role: Role
-      createdAt: Date
-      updatedAt: Date
+      image?: string | null
+      emailVerified?: Date | null
     }
-  }
-
-  interface User {
-    id: string
-    name: string | null
-    email: string | null
-    emailVerified: Date | null
-    image: string | null
-    password: string | null
-    role: Role
-    createdAt: Date
-    updatedAt: Date
   }
 }
 
