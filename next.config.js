@@ -6,7 +6,10 @@ const nextConfig = {
   },
   experimental: {
     optimizeCss: true,
-    typedRoutes: true
+    typedRoutes: true,
+    speedInsights: {
+      enabled: true,
+    },
   }
 }
 
