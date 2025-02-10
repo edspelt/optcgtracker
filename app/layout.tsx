@@ -6,6 +6,7 @@ import { SessionProvider } from "@/components/providers/SessionProvider"
 import { Toaster } from 'react-hot-toast'
 import Navbar from "@/components/Navbar"
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -47,6 +48,7 @@ export default function RootLayout({
           </SessionProvider>
         </ThemeProvider>
         <SpeedInsights />
+        <Analytics />
       </body>
     </html>
   )
