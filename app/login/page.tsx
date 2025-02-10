@@ -1,13 +1,21 @@
-import { getServerSession } from 'next-auth'
-import { redirect } from 'next/navigation'
+import { Metadata } from 'next'
+import AuthLayout from '@/components/auth/AuthLayout'
 import LoginForm from '@/components/auth/LoginForm'
 
-export default async function LoginPage() {
-  const session = await getServerSession()
+export const metadata: Metadata = {
+  title: 'Iniciar Sesión - OP TCG Tracker',
+  description: 'Inicia sesión en OP TCG Tracker y gestiona tus partidas de One Piece TCG',
+}
 
-  if (session) {
-    redirect('/dashboard')
-  }
-
-  return <LoginForm />
+export default function LoginPage() {
+  return (
+    <AuthLayout 
+      title="Bienvenido de nuevo"
+      subtitle="Inicia sesión para continuar"
+      linkText="¿No tienes cuenta? Regístrate aquí"
+      linkHref="/register"
+    >
+      <LoginForm />
+    </AuthLayout>
+  )
 } 

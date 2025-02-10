@@ -2,30 +2,16 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-// import { useTheme } from 'next-themes'
-import { useEffect, useState } from 'react'
 import { ArrowRightIcon } from '@heroicons/react/24/outline'
 
 export default function HomeClient() {
-  // const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => {
-    setMounted(true)
-  }, [])
-
-  if (!mounted) return null
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-op-yellow/5 via-white to-op-red/5 dark:from-op-dark-light dark:via-op-dark dark:to-op-dark-lighter">
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Hero Section */}
-        <motion.div 
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-        >
+        {/* Hero Section y Botones - Siempre visibles */}
+        <div className="text-center mb-16">
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6">
             <span className="block text-gray-900 dark:text-white mb-2">
               Domina tus partidas de
@@ -38,6 +24,8 @@ export default function HomeClient() {
             La herramienta definitiva para jugadores de One Piece TCG. 
             Registra tus partidas, analiza tu rendimiento y mejora tu estrategia.
           </p>
+
+          {/* Botones siempre visibles */}
           <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center items-center">
             <Link
               href="/register"
@@ -53,13 +41,13 @@ export default function HomeClient() {
               Iniciar Sesión
             </Link>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Features Grid */}
+        {/* Features Grid - Aparece con fade in */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16"
         >
           <div className="bg-white/80 dark:bg-op-dark-lighter/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
@@ -88,7 +76,7 @@ export default function HomeClient() {
 
           <div className="bg-white/80 dark:bg-op-dark-lighter/80 backdrop-blur-sm p-8 rounded-2xl shadow-lg hover:shadow-xl transition-shadow">
             <div className="w-12 h-12 bg-gradient-op rounded-xl flex items-center justify-center mb-6">
-              <span className="text-2xl">📊</span>
+              <span className="text-2xl">��</span>
             </div>
             <h3 className="text-xl font-semibold mb-4 dark:text-white">
               Estadísticas Detalladas
@@ -100,8 +88,13 @@ export default function HomeClient() {
         </motion.div>
       </main>
 
-      {/* Footer */}
-      <footer className="bg-white/90 dark:bg-op-dark/90 border-t border-gray-100 dark:border-gray-800 py-8">
+      {/* Footer - Aparece con fade in */}
+      <motion.footer
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.5, delay: 0.3 }}
+        className="bg-white/90 dark:bg-op-dark/90 border-t border-gray-100 dark:border-gray-800 py-8"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
             <div>
@@ -134,7 +127,7 @@ export default function HomeClient() {
             </p>
           </div>
         </div>
-      </footer>
+      </motion.footer>
     </div>
   )
 } 
