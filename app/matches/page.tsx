@@ -70,9 +70,14 @@ export default async function MatchesPage() {
     }
   })
 
+  const transformedMatches = matches.map(match => ({
+    ...match,
+    tournament: match.tournament || undefined
+  }));
+
   return (
     <MatchesClient 
-      initialMatches={matches}
+      initialMatches={transformedMatches}
       users={users}
       currentUser={session.user}
       tournaments={tournaments}

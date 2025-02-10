@@ -1,24 +1,33 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { User, Tournament } from '@prisma/client'
+import { Tournament } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import BackButton from '@/components/common/BackButton'
+import { User } from '@/types'
 
 interface NewMatchFormProps {
   users: Pick<User, 'id' | 'name' | 'email'>[]
-  currentUser: User // Requerido para futuras funcionalidades
+  currentUser: User
   preselectedTournament?: Tournament | null
+}
+
+interface MatchFormDetails {
+  player1Leader: string;
+  player2Leader: string;
+  result: 'WIN' | 'LOSS';
+  tournamentId: string;
+  notes: string;
 }
 
 export default function NewMatchForm({ users, currentUser, preselectedTournament }: NewMatchFormProps) {
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedUser, setSelectedUser] = useState<(typeof users)[0] | null>(null)
-  const [matchDetails, setMatchDetails] = useState({
-    player1Leader: '',
+  const [matchDetails, setMatchDetails] = useState<MatchFormDetails>({
+    player1Leader: currentUser.preferredLeader || '',
     player2Leader: '',
-    result: 'WIN' as const,
+    result: 'WIN',
     tournamentId: preselectedTournament?.id || '',
     notes: ''
   })
@@ -30,10 +39,10 @@ export default function NewMatchForm({ users, currentUser, preselectedTournament
   )
 
   useEffect(() => {
-    if (currentUser.preferredLeader) {
+    if (currentUser?.preferredLeader) {
       setMatchDetails(prev => ({
         ...prev,
-        player1Leader: currentUser.preferredLeader
+        player1Leader: currentUser.preferredLeader || ''
       }))
     }
   }, [currentUser])

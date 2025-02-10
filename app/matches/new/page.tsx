@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation';
 import { authOptions } from '@/lib/auth';
 import { prisma } from '@/lib/prisma';
 import NewMatchForm from '@/components/matches/NewMatchForm';
+import { User } from '@/types';
 
 export default async function NewMatchPage({
   searchParams,
@@ -61,11 +62,13 @@ export default async function NewMatchPage({
       }
     }
 
+    const currentUser = session.user as User;
+
     // Renderizar el formulario de nuevo partido
     return (
       <NewMatchForm
         users={users}
-        currentUser={session.user}
+        currentUser={currentUser}
         preselectedTournament={tournament}
       />
     );

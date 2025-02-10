@@ -2,36 +2,36 @@
 
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
-import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
-export default function LoginForm() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
+interface LoginFormProps {
+  callbackUrl?: string
+}
+
+export default function LoginForm({ callbackUrl = '/' }: LoginFormProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const [showPassword, setShowPassword] = useState(false)
-  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsLoading(true)
-    setError('')
+    setError(null)
 
     const formData = new FormData(e.currentTarget)
     
     try {
-      const res = await signIn('credentials', {
+      const result = await signIn('credentials', {
         email: formData.get('email'),
         password: formData.get('password'),
         redirect: false,
+        callbackUrl
       })
 
-      if (res?.error) {
+      if (!result?.ok) {
         setError('Credenciales inválidas')
       } else {
-        router.push(callbackUrl)
-        router.refresh()
+        window.location.href = callbackUrl
       }
     } catch {
       setError('Ocurrió un error al iniciar sesión')

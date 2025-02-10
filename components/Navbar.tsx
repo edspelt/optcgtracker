@@ -3,7 +3,24 @@
 import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { useState } from 'react'
-import { Role } from '@prisma/client'
+import type { Route } from 'next'
+
+interface NavItem {
+  name: string;
+  href: Route;
+  requiresAuth?: boolean;
+  requiresAdmin?: boolean;
+  requiresJudge?: boolean;
+}
+
+const navigation: NavItem[] = [
+  { name: 'Inicio', href: '/dashboard' as Route },
+  { name: 'Torneos', href: '/tournaments/list' as Route, requiresAuth: true },
+  { name: 'Partidas', href: '/matches' as Route, requiresAuth: true },
+  { name: 'Ranking', href: '/rankings' as Route, requiresAuth: true },
+  { name: 'Aprobar Partidas', href: '/matches/approve' as Route, requiresAuth: true, requiresJudge: true },
+  { name: 'Gestión Usuarios', href: '/admin/users' as Route, requiresAuth: true, requiresAdmin: true },
+]
 
 export default function Navbar() {
   const { data: session, status } = useSession()
@@ -16,7 +33,6 @@ export default function Navbar() {
     })
   }
 
-  // Si está cargando, mostrar un navbar básico
   if (status === 'loading') {
     return (
       <nav className="w-full bg-white dark:bg-op-dark shadow">
@@ -33,7 +49,6 @@ export default function Navbar() {
     )
   }
 
-  // Si no hay sesión, mostrar navbar para usuarios no autenticados
   if (!session?.user) {
     return (
       <nav className="w-full bg-white dark:bg-op-dark shadow">
@@ -117,24 +132,13 @@ export default function Navbar() {
   }
 
   // El resto del código existente para usuarios autenticados...
-  const userRole = session.user.role as Role
 
-  const navigationItems = [
-    { name: 'Inicio', href: '/dashboard' },
-    { name: 'Mis Partidas', href: '/matches' },
-    { name: 'Torneos', href: '/tournaments/list' },
-    { name: 'Rankings', href: '/rankings' },
-    // Enlaces para jueces y admins
-    ...(userRole === 'JUDGE' || userRole === 'ADMIN' ? [
-      { name: 'Gestionar Torneos', href: '/tournaments/manage' },
-      { name: 'Aprobar Partidas', href: '/matches/pending' }
-    ] : []),
-    // Enlaces solo para admins
-    ...(userRole === 'ADMIN' ? [
-      { name: 'Gestionar Usuarios', href: '/admin/users' },
-      { name: 'Configuración', href: '/admin/settings' }
-    ] : [])
-  ]
+  const filteredNavigation = navigation.filter(item => {
+    if (item.requiresAuth && !session) return false
+    if (item.requiresAdmin && session?.user?.role !== 'ADMIN') return false
+    if (item.requiresJudge && !['ADMIN', 'JUDGE'].includes(session?.user?.role || '')) return false
+    return true
+  })
 
   return (
     <nav className="w-full bg-white dark:bg-op-dark shadow">
@@ -147,9 +151,9 @@ export default function Navbar() {
               </Link>
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
-              {navigationItems.map((item) => (
+              {filteredNavigation.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.href.toString()}
                   href={item.href}
                   prefetch={true}
                   className="inline-flex items-center px-1 pt-1 text-sm font-medium text-gray-900 dark:text-white hover:text-op-red"
@@ -163,12 +167,12 @@ export default function Navbar() {
           {/* Perfil y menú móvil */}
           <div className="flex items-center">
             <div className="hidden sm:ml-6 sm:flex sm:items-center">
-              <Link
+              {/* <Link
                 href="/profile"
                 className="text-gray-700 hover:text-op-red dark:text-gray-200 px-3 py-2 rounded-md text-sm font-medium"
               >
                 Mi Perfil
-              </Link>
+              </Link> */}
               <button
                 onClick={handleSignOut}
                 className="ml-4 text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 px-3 py-2 rounded-md text-sm font-medium"
@@ -213,9 +217,9 @@ export default function Navbar() {
         {isMenuOpen && (
           <div className="sm:hidden">
             <div className="pt-2 pb-3 space-y-1">
-              {navigationItems.map((item) => (
+              {filteredNavigation.map((item) => (
                 <Link
-                  key={item.href}
+                  key={item.href.toString()}
                   href={item.href}
                   className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 dark:text-gray-200 dark:hover:text-op-yellow dark:hover:bg-op-dark"
                   onClick={() => setIsMenuOpen(false)}
@@ -223,13 +227,13 @@ export default function Navbar() {
                   {item.name}
                 </Link>
               ))}
-              <Link
+              {/* <Link
                 href="/profile"
                 className="block px-3 py-2 text-base font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 dark:text-gray-200 dark:hover:text-op-yellow dark:hover:bg-op-dark"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Mi Perfil
-              </Link>
+              </Link> */}
               <button
                 onClick={handleSignOut}
                 className="block w-full text-left px-3 py-2 text-base font-medium text-red-600 hover:bg-gray-50 dark:hover:bg-op-dark"

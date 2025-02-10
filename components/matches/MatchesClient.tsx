@@ -5,6 +5,7 @@ import { User, Match, Tournament } from '@prisma/client'
 import { formatTournamentDuration, getRemainingDays } from '@/lib/tournament-utils'
 import BackButton from '@/components/common/BackButton'
 import { toast } from 'react-hot-toast'
+import { MatchResult } from '@/types'
 
 type MatchWithPlayers = Match & {
   player1: User
@@ -30,6 +31,14 @@ interface MatchesClientProps {
   tournaments: TournamentWithParticipants[]
 }
 
+type MatchDetails = {
+  opponentId: string
+  result: MatchResult
+  tournamentId: string | undefined
+  player1Leader: string
+  player2Leader: string
+}
+
 export default function MatchesClient({ 
   initialMatches, 
   users, 
@@ -40,12 +49,12 @@ export default function MatchesClient({
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedUser, setSelectedUser] = useState<(typeof users)[0] | null>(null)
   const [isCreating, setIsCreating] = useState(false)
-  const [matchDetails, setMatchDetails] = useState({
+  const [matchDetails, setMatchDetails] = useState<MatchDetails>({
+    opponentId: '',
+    result: 'WIN',
+    tournamentId: undefined,
     player1Leader: '',
     player2Leader: '',
-    result: 'WIN' as const,
-    tournamentId: '',
-    notes: ''
   })
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -127,11 +136,11 @@ export default function MatchesClient({
       
       // Limpiar el formulario
       setMatchDetails({
+        opponentId: '',
+        result: 'WIN',
+        tournamentId: undefined,
         player1Leader: '',
         player2Leader: '',
-        result: 'WIN',
-        tournamentId: '',
-        notes: ''
       })
       setSelectedUser(null)
       setIsCreating(false)
@@ -166,7 +175,7 @@ export default function MatchesClient({
 
       {/* Modal de creación de partida */}
       {isCreating && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white dark:bg-op-dark-lighter rounded-lg p-6 max-w-md w-full">
             <h2 className="text-xl font-bold mb-4 dark:text-white">Registrar Nueva Partida</h2>
             
@@ -215,15 +224,19 @@ export default function MatchesClient({
                 <label className="block text-sm font-medium dark:text-gray-200">Tu Líder</label>
                 <input
                   type="text"
+                  required
+                  placeholder="Nombre de tu líder"
                   className="mt-1 w-full p-2 border rounded dark:bg-op-dark"
                   value={matchDetails.player1Leader}
                   onChange={(e) => setMatchDetails({...matchDetails, player1Leader: e.target.value})}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium dark:text-gray-200">Líder Oponente</label>
+                <label className="block text-sm font-medium dark:text-gray-200">Líder del Oponente</label>
                 <input
                   type="text"
+                  required
+                  placeholder="Nombre del líder del oponente"
                   className="mt-1 w-full p-2 border rounded dark:bg-op-dark"
                   value={matchDetails.player2Leader}
                   onChange={(e) => setMatchDetails({...matchDetails, player2Leader: e.target.value})}
@@ -234,7 +247,10 @@ export default function MatchesClient({
                 <select
                   className="mt-1 w-full p-2 border rounded dark:bg-op-dark"
                   value={matchDetails.result}
-                  onChange={(e) => setMatchDetails({...matchDetails, result: e.target.value as 'WIN' | 'LOSS'})}
+                  onChange={(e) => setMatchDetails({
+                    ...matchDetails, 
+                    result: e.target.value as MatchResult
+                  })}
                 >
                   <option value="WIN">Victoria</option>
                   <option value="LOSS">Derrota</option>
@@ -244,8 +260,11 @@ export default function MatchesClient({
                 <label className="block text-sm font-medium dark:text-gray-200">Torneo</label>
                 <select
                   className="mt-1 w-full p-2 border rounded dark:bg-op-dark"
-                  value={matchDetails.tournamentId}
-                  onChange={(e) => setMatchDetails({...matchDetails, tournamentId: e.target.value})}
+                  value={matchDetails.tournamentId || ''}
+                  onChange={(e) => setMatchDetails({
+                    ...matchDetails, 
+                    tournamentId: e.target.value || undefined
+                  })}
                 >
                   <option value="">Sin torneo</option>
                   {availableTournaments.length > 0 ? (
@@ -265,14 +284,6 @@ export default function MatchesClient({
                     )}
                   </p>
                 )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium dark:text-gray-200">Notas</label>
-                <textarea
-                  className="mt-1 w-full p-2 border rounded dark:bg-op-dark"
-                  value={matchDetails.notes}
-                  onChange={(e) => setMatchDetails({...matchDetails, notes: e.target.value})}
-                />
               </div>
             </div>
 
@@ -311,7 +322,7 @@ export default function MatchesClient({
                   {match.player1.name} vs {match.player2.name}
                 </p>
                 <p className="text-sm text-gray-500 dark:text-gray-400">
-                  {match.player1Leader} vs {match.player2Leader}
+                  {match.player1.name} vs {match.player2.name}
                 </p>
                 {match.tournament && (
                   <div className="mt-1">

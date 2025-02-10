@@ -30,9 +30,9 @@ model User {
 }
 
 enum Role {
-  PLAYER    // Usuario básico - puede registrar partidas y ver rankings
-  JUDGE     // Puede crear y gestionar torneos
-  ADMIN     // Acceso total al sistema
+  PLAYER
+  JUDGE
+  ADMIN
 }
 
 model Match {

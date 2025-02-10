@@ -1,21 +1,11 @@
 'use client'
 
-import { Tournament, User } from '@prisma/client'
+import { TournamentWithDetails } from '@/types'
+import { User } from '@prisma/client'
 import { useRouter } from 'next/navigation'
 import BackButton from '@/components/common/BackButton'
 import { formatTournamentDuration } from '@/lib/tournament-utils'
 import { useState } from 'react'
-
-type TournamentWithDetails = Tournament & {
-  _count: {
-    participants: number
-    matches: number
-  }
-  participants: User[]
-  createdBy: {
-    name: string
-  }
-}
 
 interface TournamentListProps {
   tournaments: TournamentWithDetails[]
@@ -58,8 +48,16 @@ export default function TournamentList({ tournaments, currentUser }: TournamentL
             Participa en torneos y compite con otros jugadores
           </p>
         </div>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 sm:mt-0 sm:flex sm:space-x-4">
           <BackButton />
+          {(currentUser.role === 'ADMIN' || currentUser.role === 'JUDGE') && (
+            <button
+              onClick={() => router.push('/tournaments/create')}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700"
+            >
+              Crear Torneo
+            </button>
+          )}
         </div>
       </div>
 

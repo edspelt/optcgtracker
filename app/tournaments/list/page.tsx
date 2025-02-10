@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import TournamentList from '@/components/tournaments/TournamentList'
 import { updateTournamentStatuses } from '@/middleware/tournament-status'
+import { TournamentWithDetails } from '@/types'
 
 export default async function TournamentsListPage() {
   const session = await getServerSession(authOptions)
@@ -23,18 +24,15 @@ export default async function TournamentsListPage() {
       ]
     },
     include: {
-      _count: {
-        select: {
-          participants: true,
-          matches: true
+      participants: {
+        include: {
+          user: true
         }
       },
-      participants: {
-        where: {
-          userId: session.user.id
-        },
+      _count: {
         select: {
-          userId: true
+          matches: true,
+          participants: true
         }
       },
       createdBy: {
@@ -48,10 +46,27 @@ export default async function TournamentsListPage() {
     }
   })
 
-  // Transformar los datos para el componente
-  const transformedTournaments = tournaments.map(tournament => ({
-    ...tournament,
-    participants: tournament.participants.map(p => ({ id: p.userId }))
+  // Transformar los datos para que coincidan con el tipo esperado
+  const transformedTournaments: TournamentWithDetails[] = tournaments.map(tournament => ({
+    id: tournament.id,
+    name: tournament.name,
+    status: tournament.status,
+    startDate: tournament.startDate,
+    endDate: tournament.endDate,
+    duration: tournament.duration,
+    description: tournament.description,
+    maxPlayers: tournament.maxPlayers,
+    createdById: tournament.createdById,
+    createdAt: tournament.createdAt,
+    updatedAt: tournament.updatedAt,
+    _count: {
+      participants: tournament._count.participants,
+      matches: tournament._count.matches
+    },
+    participants: tournament.participants.map(participant => participant.user),
+    createdBy: {
+      name: tournament.createdBy.name
+    }
   }))
 
   return <TournamentList tournaments={transformedTournaments} currentUser={session.user} />

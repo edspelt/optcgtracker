@@ -59,13 +59,13 @@ export default function DashboardActions({ userRole }: DashboardActionsProps) {
             <p className="text-gray-600 dark:text-gray-300">Administra roles y permisos</p>
           </Link>
 
-          <Link
+          {/* <Link
             href="/admin/settings"
             className="p-4 bg-white dark:bg-op-dark-lighter rounded-lg shadow hover:shadow-md transition-shadow"
           >
             <h3 className="text-lg font-semibold mb-2">Configuración</h3>
             <p className="text-gray-600 dark:text-gray-300">Ajustes del sistema</p>
-          </Link>
+          </Link> */}
         </>
       )}
     </div>

@@ -39,9 +39,9 @@ export default function WelcomeScreen({ user }: WelcomeScreenProps) {
         {getWelcomeMessage(user.role, user.name)}
       </h1>
       <p className="text-gray-600 dark:text-gray-400">
-        {user.role === 'admin'
+        {user.role === 'ADMIN'
           ? 'Puedes gestionar usuarios, partidas y torneos.'
-          : user.role === 'player'
+          : user.role === 'PLAYER'
           ? 'Revisa tus próximas partidas y mejora tu ranking.'
           : 'Disfruta de los torneos y sigue a tus jugadores favoritos.'}
       </p>
